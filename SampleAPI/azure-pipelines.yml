@@ -1,0 +1,73 @@
+pr:
+  branches:
+    include:
+      - main
+
+trigger:
+  branches:
+    include:
+      - main
+
+
+pool:
+  name: 'SampleAPIVMPool'
+
+variables:
+  acrName: 'SampleAPIDotNetRegistry'
+  acrLoginServer: 'sampleapidotnetregistry.azurecr.io'
+  imageName: 'sampleapi'
+
+stages:
+
+- stage: Build
+  displayName: Build & Test
+  jobs:
+  - job: BuildAndTest
+    steps:
+      - task: AzureCLI@2
+        displayName: Build and Push Container Image
+        inputs:
+          azureSubscription: 'AzureFreeConnection'
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            echo "Logging in to ACR..."
+            az acr login --name $(acrName)
+
+            echo "Building Docker image..."
+            docker build -t $(acrLoginServer)/$(imageName):$(Build.BuildId) .
+
+            echo "Tagging image with branch name..."
+            docker tag $(acrLoginServer)/$(imageName):$(Build.BuildId) \
+                       $(acrLoginServer)/$(imageName):$(Build.SourceBranchName)
+
+            if [[ "$(Build.SourceBranchName)" == "main" ]]; then
+              docker tag $(acrLoginServer)/$(imageName):$(Build.BuildId) \
+                         $(acrLoginServer)/$(imageName):prod
+              docker tag $(acrLoginServer)/$(imageName):$(Build.BuildId) \
+                         $(acrLoginServer)/$(imageName):latest
+            fi
+
+            echo "Pushing images to ACR..."
+            docker push $(acrLoginServer)/$(imageName):$(Build.BuildId)
+            docker push $(acrLoginServer)/$(imageName):$(Build.SourceBranchName)
+
+            if [[ "$(Build.SourceBranchName)" == "main" ]]; then
+              docker push $(acrLoginServer)/$(imageName):prod
+              docker push $(acrLoginServer)/$(imageName):latest
+            fi
+
+- stage: Deploy
+  displayName: Deploy to Production App Service
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
+  jobs:
+  - job: DeployJob
+    steps:
+      - task: AzureWebAppContainer@1
+        displayName: Deploy to App Service (Container)
+        inputs:
+          azureSubscription: 'AzureFreeConnection'
+          appName: 'sampleapi-app'
+          containers: |
+            $(acrLoginServer)/$(imageName):$(Build.BuildId)
