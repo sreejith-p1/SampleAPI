@@ -56,26 +56,30 @@ SampleAPI is a RESTful API built with ASP.NET Core (.NET 8). It provides endpoin
 ## Screenshots
 
 ### 1. Azure App Service Overview
-![Azure App Service Overview](attachments/0)
+![Azure App Service Overview](/screenshots/AzureApp.JPG)
 
 ### 2. Azure DevOps Repo Structure
-![Azure DevOps Repo Structure](attachments/1)
+![Azure DevOps Repo Structure](/screenshots/AzureRepo.JPG)
 
 ### 3. Swagger UI (Deployed API)
-![Swagger UI](attachments/2)
+![Swagger UI](/screenshots/Deployed.JPG)
 
 ### 4. Pipeline Build Steps
-![Pipeline Build Steps](attachments/3)
+![Pipeline Build Steps](/screenshots/Job.JPG)
 
 ### 5. Pipeline Run History
-![Pipeline Run History](attachments/4)
+![Pipeline Run History](/screenshots/Jobs.JPG)
 
 ### 6. Pull Request Approval
-![Pull Request Approval](attachments/5)
+![Pull Request Approval](/screenshots/PullRequest.JPG)
 
 ### 7. Agent Pool
-![Agent Pool](attachments/6)
+![Agent Pool](/screenshots/SelfHostedAgent.JPG)
 
 ### 8. VM Details (Agent Host)
-![VM Details](attachments/7)
+![VM Details](/screenshots/VM_Screenshot.JPG)
+
+### 9 container Registry (ACR)
+![Container Registry](/screenshots/Containerreg.JPG)
+
 
